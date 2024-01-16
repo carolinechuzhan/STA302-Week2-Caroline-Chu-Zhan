@@ -1,1 +1,104 @@
+---
+title: "Toronto Waitlist Data for Social Housing"
+author: "Chu(Caroline) Zhan"
+student number: "1007031702"
+format: html
+---
+
+```{r}
+library(opendatatoronto)
+library(dplyr)
+library(stringr)
+```
+
+```{r}
+citation() # Get the citation information for R
+citation('ggplot2') 
+```
+
+```{r}
+# get package
+package <- show_package("centralized-waiting-list-activity-for-social-housing")
+package
+```
+
+```{r}
+# get all resources for this package
+resources <- list_package_resources("centralized-waiting-list-activity-for-social-housing")
+```
+
+```{r}
+# identify datastore resources; by default, Toronto Open Data sets datastore resource format to CSV for non-geospatial and GeoJSON for geospatial resources
+datastore_resources <- filter(resources, tolower(format) %in% c('csv', 'geojson'))
+
+```
+
+```{r}
+# load the first datastore resource as a sample
+data <- filter(datastore_resources, row_number()==1) %>% get_resource()
+data
+
+write_csv(
+  x = data,
+  file = "waitlist time.csv"
+)
+
+data <-
+  read_csv(
+    file = "waitlist time.csv",
+    show_col_types = FALSE
+  )
+```
+
+```{r}
+# The year = word(quarter_year, -1) line is learned from https://stackoverflow.com/questions/17658216/extract-last-word-in-string-in-r.
+cleaned_data <- clean_names(data)
+
+cleaned_data <-
+  cleaned_data |>
+  select(quarter_year, new_reactivated, housed, inactive_cancelled, seniors)|>
+  mutate(year = word(quarter_year, -1)) 
+
+cleaned_data
+
+cleaned_data_2 <- cleaned_data |>
+  select(year, new_reactivated, housed, inactive_cancelled, seniors) |>
+  group_by(year) |>
+  filter(year < 2023) |>
+  summarise(new_reactivated = sum(new_reactivated),
+            housed = sum(housed),
+            inactive_cancelled = sum(inactive_cancelled),
+            seniors = sum(seniors))
+
+cleaned_data_2
+```
+
+
+```{r}
+cleaned_data_2 |> 
+  ggplot(aes(x = year, y = new_reactivated, color = "country")) +
+  geom_point()+ 
+  theme_minimal() +
+  labs(x = "Year", y = "New reactivated number of people per year", color = "Country")
+
+cleaned_data_2 |> 
+  ggplot(aes(x = year, y = housed, color = "country")) +
+  geom_point()+ 
+  theme_minimal() +
+  labs(x = "Year", y = "Number of housed people", color = "Country")
+
+cleaned_data_2 |> 
+  ggplot(aes(x = year, y = inactive_cancelled, color = "country")) +
+  geom_point()+ 
+  theme_minimal() +
+  labs(x = "Year", y = "Number of inactive people", color = "Country")
+
+cleaned_data_2 |> 
+  ggplot(aes(x = year, y = seniors, color = "country")) +
+  geom_point()+ 
+  theme_minimal() +
+  labs(x = "Year", y = "Number of seniors", color = "Country")
+
+```
+
 
