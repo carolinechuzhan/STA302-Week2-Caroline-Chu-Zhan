@@ -10,6 +10,7 @@ library(opendatatoronto)
 library(dplyr)
 library(stringr)
 ```
+### Social housing is always a key area in housing that Torontonians care about. This report will use data from Open Data Toronto named "Centralized Waiting List Activity for Social Housing".
 
 ```{r}
 citation() # Get the citation information for R
@@ -49,6 +50,7 @@ data <-
     show_col_types = FALSE
   )
 ```
+### The initial data we have contains Quarter/Year which does not allow meaningful ranking in between different times. We will only include years 2019 to 2022 (not 2023 due to missing data). The number of people who are new to social housing or have reactivated their participation in the program is emphasized, the number of people housed in the program, the number of people who are inactive or have cancelled their program, and the number of seniors who are particularly vulnerable are included in our analysis.
 
 ```{r}
 # The year = word(quarter_year, -1) line is learned from https://stackoverflow.com/questions/17658216/extract-last-word-in-string-in-r.
@@ -72,6 +74,7 @@ cleaned_data_2 <- cleaned_data |>
 
 cleaned_data_2
 ```
+
 
 
 ```{r}
@@ -99,6 +102,8 @@ cleaned_data_2 |>
   theme_minimal() +
   labs(x = "Year", y = "Number of seniors", color = "Country")
 
+
 ```
+### Generally speaking, we observe some fluctuations for each group of people. The number of new or reactivated program users can tell the urgency of social housing, and it is beyond 20,000 for both 2019 and 2022, which can be partly due to Covid-19. Moreover, 2022 also has the largest number of housed people being over 3000. Additionally, there is a huge drop from 2021 to 2022 for inactive people, meaning that it was unlikely for people in need not to need social housing in 2022. Last but not least, the number of seniors who use social housing also peaked in 2022 as over 140,000.
 
-
+### Future research can look into the racial makeup of vulnerable groups like the senior group who use social housing, and people's household income and educational background to gain a deeper understanding of social inequality and social issues.
